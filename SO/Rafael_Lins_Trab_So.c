@@ -6,6 +6,13 @@
 #include <string.h>
 #include <stdlib.h>
 
+
+/*
+    Linha para execucao no prompt
+    gcc -pthread -o teste Rafael_Lins_Trab_So.c
+*/
+
+
 void *pegaid(void *arg){
     char *name = arg;
     pthread_t id = pthread_self();
