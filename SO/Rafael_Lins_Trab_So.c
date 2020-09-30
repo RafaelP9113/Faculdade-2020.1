@@ -230,13 +230,15 @@ void EX03(){
         int vet_mod[100000];
         int vet_comp[100000];   
     }vetores;
+    int fd1[2];
+    int fd2[2];
     int* vetores_num;
-    struct vetores* vets;
+    //vetores vets;
     vetores_num = (int *) shm_addr;
     //*vetores_num = 0;
     //vets = (struct vetores*) ((void*)shm_addr+(sizeof(int)));
     
-    
+    /*
     for (int i = 0; i < 100000; i++){
         int num = rand()%100;
         while (num == 0){
@@ -244,10 +246,10 @@ void EX03(){
         }
         vetor_modificado[i] = num;
         vetor_completo[i] = num;
-        vets->vet_mod[i] = num;
+        vets.vet_mod[i] = num;
         //vets[0].vet_comp[i] = num;
     }
-   
+   */
     pid_t child_pid;
     int child_status;
     child_pid = fork();
@@ -257,15 +259,52 @@ void EX03(){
             perror("fork");
             exit(1);
         case 0:
-            remove5(vetor_modificado);
+            close(fd1[1]);
+            int* vets2[100000];
+            read(fd1[0], vets2, sizeof(vets2)+1);
+            remove5(vets2);
+            close(fd1[0]);
+            write(fd1[1], vets2, sizeof(vets2)+1);
+            close(fd1[1]);
+            
             
             exit(0);
         default:
+            close(fd1[0]);
+            close(fd2[0]);
+            int vets_mod[100000];
+            int vets_comp[100000];
+            for (int i = 0; i < 100000; i++){
+        int num = rand()%100;
+        while (num == 0){
+            num = rand()%100;
+        }
+        vetor_modificado[i] = num;
+        vetor_completo[i] = num;
+        vets_mod[i] = num;
+        vets_comp[i] = num;
+        
+    }
+            write(fd2[1], vets_comp, sizeof(vets_comp)+1);
+            write(fd1[1], vets_mod, sizeof(vets_mod)+1);
+            close(fd1[1]);
+            close(fd2[1]);
             //printf("eae antes\n"); faz primeiro de tudo
-            //remove5(vetor_modificado);
-            wait(&child_status); 
-            removepar(vetor_modificado);
-            avalia_vet(vetor_modificado, vetor_completo);
+            wait(&child_status);
+            close(fd1[1]);
+            close(fd2[1]);
+            int vets3[100000];
+            int vets_comp2[100000];
+            read(fd1[0], vets3, sizeof(vets3)+1);
+            read(fd2[0], vets_comp2, sizeof(vets_comp2)+1);
+            removepar(vets3);
+            close(fd1[0]);
+            close(fd2[0]);
+            write(fd1[1], vets3, sizeof(vets3)+1);
+            write(fd2[1], vets_comp2, sizeof(vets_comp2)+1);
+            close(fd1[1]);
+            close(fd2[1]);
+            avalia_vet(vets3,vets_comp2);
     
             //printf("eae depois\n"); faz quando acabar processo filho  
             
@@ -275,8 +314,8 @@ void EX03(){
 }
 
 int main(void){
-    //EX01();
-    //EX02();
+    EX01();
+    EX02();
     EX03();
 }
     
