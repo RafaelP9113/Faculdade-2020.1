@@ -11,6 +11,7 @@
 #include <sys/wait.h>
 #include <signal.h>
 #include <errno.h>
+#include <sys/shm.h>
 
 
 /*
@@ -219,6 +220,23 @@ void EX03(){
     clock_t t1;
     t1 = clock();
     int vetor_modificado[100000], vetor_completo[100000];
+    int shm_id;
+    char* shm_addr;
+    char* shm_addr_ro;
+    shm_id = shmget(100, (2*sizeof(vetor_modificado[100000])), IPC_CREAT | IPC_EXCL | 0600);
+    shm_addr = shmat(shm_id, NULL,0);
+
+    typedef struct{
+        int vet_mod[100000];
+        int vet_comp[100000];   
+    }vetores;
+    int* vetores_num;
+    struct vetores* vets;
+    vetores_num = (int *) shm_addr;
+    //*vetores_num = 0;
+    //vets = (struct vetores*) ((void*)shm_addr+(sizeof(int)));
+    
+    
     for (int i = 0; i < 100000; i++){
         int num = rand()%100;
         while (num == 0){
@@ -226,12 +244,14 @@ void EX03(){
         }
         vetor_modificado[i] = num;
         vetor_completo[i] = num;
+        vets->vet_mod[i] = num;
+        //vets[0].vet_comp[i] = num;
     }
    
     pid_t child_pid;
     int child_status;
     child_pid = fork();
-  
+   
     switch (child_pid){
         case -1:
             perror("fork");
@@ -242,7 +262,7 @@ void EX03(){
             exit(0);
         default:
             //printf("eae antes\n"); faz primeiro de tudo
-            remove5(vetor_modificado);
+            //remove5(vetor_modificado);
             wait(&child_status); 
             removepar(vetor_modificado);
             avalia_vet(vetor_modificado, vetor_completo);
@@ -255,7 +275,8 @@ void EX03(){
 }
 
 int main(void){
-    EX01();
-    EX02();
+    //EX01();
+    //EX02();
     EX03();
 }
+    
