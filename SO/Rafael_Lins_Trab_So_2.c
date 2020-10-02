@@ -256,9 +256,9 @@ void EX03(){
         if (child_pid > 0){
 
             //Processo Pai
-    
-            int vets_mod[100000];
-            int vets_comp[100000];
+            
+            int* vets_mod = (int*)malloc(100000 * sizeof(int));
+            int* vets_comp = (int*)malloc(100000 * sizeof(int));
             close(fd1[0]);
             close(fd2[1]);
             
@@ -288,12 +288,14 @@ void EX03(){
             }
             
             close(fd2[0]);
-            close(fd1[1]); 
+            close(fd1[1]);
+            free(vets_mod);
+            free(vets_comp); 
         }
      
             
         else{
-            int vets_mod_2[100000];
+            int* vets_mod_2 = (int*)malloc(100000 * sizeof(int));
             close(fd1[1]);
             close(fd2[0]);
             
@@ -315,6 +317,7 @@ void EX03(){
             }
             close(fd2[1]);
             close(fd1[0]);
+            free(vets_mod_2);
 }
     
         
@@ -334,4 +337,3 @@ void main(void){
     //EX02();
     //EX03();
 }
-    
