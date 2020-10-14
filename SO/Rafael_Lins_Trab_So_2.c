@@ -26,12 +26,14 @@ sem_t S; // Variavel Semaforo.
 
 void avalia_vet(int * vet_mod, int * vet_comp){    
     int cont = 0;
-    for (int i = 0; i < 100000; i++){
+    int tam = sizeof(vet_mod) / sizeof(int);
+    for (int i = 0; i < tam; i++){
         if((vet_mod[i] != 0) && (vet_mod[i] % 2) == 0){
-            cont += 1;
+            
         }
         if((vet_mod[i] != 0) && (vet_mod[i] % 5) == 0){
             cont += 1;
+            
         }
         if(((vet_comp[i] != 0) && (vet_comp[i] % 2) != 0) && ((vet_comp[i] != 0) && (vet_comp[i] % 5) != 0)){
             if(vet_mod[i] == 0){
@@ -62,12 +64,22 @@ void *pegaid(void *arg){
 
 void *removepar(void *arg){
 
-    int *num = arg;
-    for (int i = 0; i < 100000; i++){
+    int *vetor_modificado = arg;    
+    int i,j,k;
+    int tam = sizeof(vetor_modificado) / sizeof(int);
+    for(i = 0; i < tam; i++){
         int number = i - 99999;
         number = number * (-1);
-        if((num[number] % 2) == 0){
-            num[number] = 0; 
+        for(j = number + 1; j < tam;){
+            if(vetor_modificado[j] % 2 == 0){
+                for(k = j; k < tam; k++){
+                    vetor_modificado[k] = vetor_modificado[k + 1];
+                }
+            tam--;            
+            }
+        else{
+            j++;
+        }        
         }
     }
 
@@ -75,41 +87,77 @@ void *removepar(void *arg){
 
 void *remove5(void *arg){
 
-    int *num = arg;
-    for (int i =0; i < 100000; i++){
+    int *vetor_modificado = arg;    
+    int i,j,k;
+    int tam = sizeof(vetor_modificado) / sizeof(int);
+    for(i = 0; i < tam; i++){
         int number = i - 99999;
         number = number * (-1);
-        if((num[number] % 5) == 0){
-            num[number] = 0; 
+        for(j = number + 1; j < tam;){
+            if(vetor_modificado[j] % 5 == 0){
+                for(k = j; k < tam; k++){
+                    vetor_modificado[k] = vetor_modificado[k + 1];
+                }
+            tam--;            
+            }
+        else{
+            j++;
+        }        
         }
     }
+
 }
 
 void *remove5_semaphore(void *arg){
 
     sem_wait(&S);
-    int *num = arg;
-    for (int i =0; i < 100000; i++){
+    int *vetor_modificado = arg;    
+    int i,j,k;
+    int tam = sizeof(vetor_modificado) / sizeof(int);
+    for(i = 0; i < tam; i++){
         int number = i - 99999;
         number = number * (-1);
-        if((num[number] % 5) == 0){
-            num[number] = 0; 
+        for(j = number + 1; j < tam;){
+            if(vetor_modificado[j] % 5 == 0){
+                for(k = j; k < tam; k++){
+                    vetor_modificado[k] = vetor_modificado[k + 1];
+                }
+            tam--;            
+            }
+        else{
+            j++;
+        }        
         }
     }
+
+
+
     sem_post(&S);
 }
 
 void *removepar_semaphore(void *arg){
 
     sem_wait(&S);
-    int *num = arg;
-    for (int i = 0; i < 100000; i++){
+    int *vetor_modificado = arg;    
+    int i,j,k;
+    int tam = sizeof(vetor_modificado) / sizeof(int);
+    for(i = 0; i < tam; i++){
         int number = i - 99999;
         number = number * (-1);
-        if((num[number] % 2) == 0){
-            num[number] = 0; 
+        for(j = number + 1; j < tam;){
+            if(vetor_modificado[j] % 2 == 0){
+                for(k = j; k < tam; k++){
+                    vetor_modificado[k] = vetor_modificado[k + 1];
+                }
+            tam--;            
+            }
+        else{
+            j++;
+        }        
         }
     }
+
+
     sem_post(&S);
 }
 
@@ -175,6 +223,7 @@ void part2_semaphore(){
 void part2(){
 
     int vetor_modificado[100000], vetor_completo[100000];
+ 
     for (int i = 0; i < 100000; i++){
         int num = rand()%100;
         while (num == 0){
@@ -183,9 +232,9 @@ void part2(){
         vetor_modificado[i] = num;
         vetor_completo[i] = num;
     }
+
     removepar(vetor_modificado);
     remove5(vetor_modificado);
-  
     avalia_vet(vetor_modificado, vetor_completo);
 }
 
@@ -337,3 +386,4 @@ void main(void){
     //EX02();
     //EX03();
 }
+    
